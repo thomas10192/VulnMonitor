@@ -91,16 +91,25 @@ def fetch_recent_critical_cves_from_history():
         "pubEndDate": end_str
     }
 
-    #response = requests.get(history_url, params=params)
-    #data = response.json()
+    response = requests.get(history_url, params=params)
+    
+
+    if response.status_code != 200:
+        print(f"Failed to retrive data {response.status_code}")
+        exit()
+        
+
+    data = response.json()
+
+    
 
     # Serializing json
-    #json_object = json.dumps(data, indent=4)
+    json_object = json.dumps(data, indent=4)
     
 
     # Writing to sample.json
-    #with open("nvdcve-1.1-recent.json", "w") as outfile:
-     #  outfile.write(json_object)
+    with open("nvdcve-1.1-recent.json", "w") as outfile:
+       outfile.write(json_object)
 
     # Load NVD data from a local .json file
     with open("nvdcve-1.1-recent.json", "r") as file:
@@ -126,7 +135,7 @@ def main ():
         
         published= item["cve"]["published"]
         lastModified = item["cve"]["lastModified"]
-        descriptions = item["cve"]["descriptions"][0]["value"]
+        descriptions = item["cve"]["descriptions"]
         
         descriptions_lan = item["cve"]["descriptions"][0]["lang"]
             
@@ -143,14 +152,14 @@ def main ():
 
             if cve_mentions_vendor(cve_data):
                 cve_count += 1
-                print("Relevant CVE:", cve)
-                print("NVD Published Date:", published)
-                print("NVD Last Modified:", lastModified)
-                print("CVSS Version:", version)
-                print("Severity:", baseSeverity)
-                print("Base Score:", baseScore)
-                print("Vector:", vectorString)
-                print("Descriptions:", check_descriptions_language(item["cve"]["descriptions"])) 
+                print(f"Relevant CVE: {cve}")
+                print(f"NVD Published Date: {published}")
+                print(f"NVD Last Modified: {lastModified}")
+                print(f"CVSS Version: {version}")
+                print(f"Severity: {baseSeverity}")
+                print(f"Base Score: {baseScore}")
+                print(f"Vector: {vectorString}")
+                print(f"Descriptions: {check_descriptions_language(descriptions)}")
                 print("   ")
     print(f"There is {cve_count} number to look at!!")
     

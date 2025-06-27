@@ -2,8 +2,6 @@ import requests
 import datetime
 import urllib.parse
 import json
-from itertools import product
-from cvss import CVSS3  # pip install cvss
 import re
 import pandas as pd
 import openpyxl
