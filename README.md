@@ -36,11 +36,11 @@ pip install requests openpyxl python-dotenv
 Clone the repo or place the script and files in a directory.
 
 Create a .env file in the same directory:
-```
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_email_password_or_app_password
-EMAIL_TO=recipient1@example.com,recipient2@example.com
-``` 
+
+EMAIL_USER=your_email@gmail.com<br/>
+EMAIL_PASS=your_email_password_or_app_password<br/>
+EMAIL_TO=recipient1@example.com,recipient2@example.com<br/>
+ 
 ⚠️ If using Gmail, enable "App Passwords" or allow less secure apps.
 
 Create vendors_list.xlsx with vendor names in a single column (one name per row).
@@ -53,14 +53,16 @@ Sends an email titled: Daily CVE Report.
 If no matching CVEs are found, it sends an email with: "No new CVEs for today!!!"
 
 ### ✅ Example Email Content
-```
-There are 2 CVEs to look at!
 
-Relevant CVE: CVE-2025-XXXX
-Published Date: 2025-06-27T15:23Z
-Severity: CRITICAL
-Base Score: 9.8
-Vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
-Description: [Short description]
-...
-```
+There are 2 CVEs to look at!<br/>
+
+Relevant CVE: CVE-2025-XXXX<br/>
+Published Date: 2025-06-27T15:23Z<br/>
+Severity: CRITICAL<br/>
+Base Score: 9.8<br/>
+Vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H<br/>
+Description: [Short description]<br/>
+...<br/>
+
+![image](https://github.com/user-attachments/assets/0134f320-c13a-40d1-9e17-bc3f8f4d4aa1)
+
