@@ -139,9 +139,6 @@ def fetch_recent_critical_cves_from_history():
     with open("nvdcve-1.1-recent.json", "r") as file:
         data = json.load(file)
 
-    
-    #print(f"🔍 Checking CVEs updated between {start_time} and {now}")
-    print("  ")
 
     return data
 
@@ -192,7 +189,7 @@ Description: {check_descriptions_language(descriptions)}
         body="".join(email_body),
         to_emails = os.getenv("EMAIL_TO").split(","),
         from_email = os.getenv("EMAIL_USER"),
-        smtp_server = "smtp.gmail.com",
+        smtp_server = os.getenv("SMTP_SERVER"),
         smtp_port = 587,
         username = os.getenv("EMAIL_USER"),
         password = os.getenv("EMAIL_PASS")
