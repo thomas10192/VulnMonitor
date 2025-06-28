@@ -69,10 +69,6 @@ def check_descriptions_language(description_data):
 
 vendors_list = [v.strip() for v in Get_vendors() if v]
 
-print(vendors_list)
-
-pattern = r'(?:' + '|'.join(re.escape(v) for v in vendors_list) + r')'
-
 def cve_mentions_vendor(cve_entry):
     texts = []
 
@@ -94,8 +90,11 @@ def cve_mentions_vendor(cve_entry):
     #print(texts)
     # Combine all text and search
     combined_text = " ".join(texts)
-    #print(combined_text)
-    return bool(re.search(pattern, combined_text, re.IGNORECASE))
+    combined_text_lower = combined_text.lower()
+   
+    mentioned_vendors = [vendor for vendor in vendors_list if vendor.lower() in combined_text_lower]
+    
+    return bool(mentioned_vendors)
 
 
 def fetch_recent_critical_cves_from_history():
@@ -143,8 +142,6 @@ def fetch_recent_critical_cves_from_history():
 
     
     #print(f"🔍 Checking CVEs updated between {start_time} and {now}")
-    print(start_str)
-    print(now)
     print("  ")
 
     return data
@@ -166,6 +163,7 @@ def main():
 
         baseSeverity = GetcvssMetric["baseSeverity"]
         if baseSeverity == "CRITICAL" and cve_mentions_vendor(cve_data):
+            
             cve_count += 1
             details = f"""
 Relevant CVE: {cve_id}
@@ -190,16 +188,16 @@ Description: {check_descriptions_language(descriptions)}
         email_body.insert(0, header)
 
     # Send email inside main
-    #send_email(
-     #   subject="Daily CVE Report",
-      #  body="".join(email_body),
-       # to_emails = os.getenv("EMAIL_TO").split(","),
-       # from_email = os.getenv("EMAIL_USER"),
-       # smtp_server = "smtp.gmail.com",
-       # smtp_port = 587,
-       # username = os.getenv("EMAIL_USER"),
-        #password = os.getenv("EMAIL_PASS")
-    #)
+    send_email(
+        subject="Daily CVE Report",
+        body="".join(email_body),
+        to_emails = os.getenv("EMAIL_TO").split(","),
+        from_email = os.getenv("EMAIL_USER"),
+        smtp_server = "smtp.gmail.com",
+        smtp_port = 587,
+        username = os.getenv("EMAIL_USER"),
+        password = os.getenv("EMAIL_PASS")
+    )
 
 
 if __name__ == "__main__":

@@ -1,8 +1,20 @@
-import re
+# List of vendor keywords (you can customize this list)
+vendor_keywords = ["WordPress", "Wordfence", "Microsoft", "Apache", "Cisco", "Fortinet", "eosphoros-ai"]
 
-test_vendors = ['eosphoros-ai', 'HKUDS']
-pattern = r'(' + '|'.join(re.escape(v) for v in test_vendors) + r')'
-sample_text = "This CVE affects eosphoros-ai and also mentions HKUDS devices."
+# Example text
+text = """
+The PT Project Notebooks plugin for WordPress is vulnerable to Privilege eosphoros-ai Escalation...
+security@wordfence.com https://www.wordfence.com/threat-intel/vulnerabilities/id/552ec9fc...
+"""
 
-match = re.search(pattern, sample_text, re.IGNORECASE)
-print("Match found:", bool(match))
+def ketword_check():
+
+    # Normalize text (optional: lowercase for case-insensitive search)
+    text_lower = text.lower()
+
+    # Find all mentioned vendors
+    mentioned_vendors = [vendor for vendor in vendor_keywords if vendor.lower() in text_lower]
+    return bool(mentioned_vendors)
+
+print(f"There is {ketword_check()}")
+
