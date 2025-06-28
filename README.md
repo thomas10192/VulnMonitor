@@ -50,10 +50,10 @@ Prints matching CVEs in the console.
 
 Sends an email titled: Daily CVE Report.
 
-If no matching CVEs are found: "No new CVEs for today!!!"
+If no matching CVEs are found, it sends an email with: "No new CVEs for today!!!"
 
 ### ✅ Example Email Content
-
+```
 There are 2 CVEs to look at!
 
 Relevant CVE: CVE-2025-XXXX
@@ -63,3 +63,4 @@ Base Score: 9.8
 Vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
 Description: [Short description]
 ...
+```
