@@ -41,7 +41,14 @@ EMAIL_USER=your_email@gmail.com<br/>
 EMAIL_PASS=your_email_password_or_app_password<br/>
 EMAIL_TO=recipient1@example.com,recipient2@example.com<br/>
  
-⚠️ If using Gmail, enable "App Passwords" or allow less secure apps.
+⚠️ If using Gmail, enable "App Passwords" or allow less secure apps.<br/>
+
+1. Enable 2-Step Verification<br/>
+https://myaccount.google.com/security<br/>
+
+2. Create an App Password<br/>
+https://myaccount.google.com/apppasswords <br/>
+Choose "Mail" > "Windows Computer"<br/>
 
 Create vendors_list.xlsx with vendor names in a single column (one name per row).
 
