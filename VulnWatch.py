@@ -1,11 +1,33 @@
 import requests
 import datetime
-import urllib.parse
 import json
-from itertools import product
-from cvss import CVSS3  # pip install cvss
 import re
 import openpyxl
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+from dotenv import load_dotenv 
+
+load_dotenv() 
+
+def send_email(subject, body, to_emails, from_email, smtp_server, smtp_port, username, password):
+    msg = MIMEMultipart()
+    msg["From"] = from_email
+    msg["To"] = ", ".join(to_emails)  # Displayed in email client
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "plain"))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(username, password)
+        server.send_message(msg)
+        server.quit()
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 
 Vendor_list = []
 
@@ -45,9 +67,11 @@ def check_descriptions_language(description_data):
     return no_desc
 
 
-vendors_list = Get_vendors()
+vendors_list = [v.strip() for v in Get_vendors() if v]
 
-pattern = r'\b(?:' + '|'.join(re.escape(kw) for kw in vendors_list) + r')\b'
+print(vendors_list)
+
+pattern = r'(?:' + '|'.join(re.escape(v) for v in vendors_list) + r')'
 
 def cve_mentions_vendor(cve_entry):
     texts = []
@@ -67,8 +91,10 @@ def cve_mentions_vendor(cve_entry):
         for metric_item in metrics[key]:
             texts.append(metric_item.get("source", ""))
 
+    #print(texts)
     # Combine all text and search
     combined_text = " ".join(texts)
+    #print(combined_text)
     return bool(re.search(pattern, combined_text, re.IGNORECASE))
 
 
@@ -115,57 +141,68 @@ def fetch_recent_critical_cves_from_history():
     with open("nvdcve-1.1-recent.json", "r") as file:
         data = json.load(file)
 
-    print(f"🔍 Checking CVEs updated between {start_time} and {now}")
+    
+    #print(f"🔍 Checking CVEs updated between {start_time} and {now}")
+    print(start_str)
+    print(now)
     print("  ")
 
     return data
 
-def main ():
-
+def main():
+    email_body = []
     cve_count = 0
-    # Iterate through each CVE item
     data = fetch_recent_critical_cves_from_history()
-    
-    for item in data.get("vulnerabilities", []):
 
-        cve = item["cve"]["id"]
+    for item in data.get("vulnerabilities", []):
         cve_data = item["cve"]
-        cvss_metric = item["cve"]["metrics"]
-        
-        
-        published= item["cve"]["published"]
-        lastModified = item["cve"]["lastModified"]
-        descriptions = item["cve"]["descriptions"]
-        
-        descriptions_lan = item["cve"]["descriptions"][0]["lang"]
-            
-        GetcvssMetric = get_cvss_metrics(cvss_metric)
-        if GetcvssMetric == None:
+        cve_id = cve_data["id"]
+        metrics = cve_data["metrics"]
+        descriptions = cve_data["descriptions"]
+        GetcvssMetric = get_cvss_metrics(metrics)
+
+        if GetcvssMetric is None:
             continue
 
         baseSeverity = GetcvssMetric["baseSeverity"]
-        version = GetcvssMetric["version"]
-        vectorString = GetcvssMetric["vectorString"]
-        baseScore = GetcvssMetric["baseScore"]
-        
-        if baseSeverity == "CRITICAL":
+        if baseSeverity == "CRITICAL" and cve_mentions_vendor(cve_data):
+            cve_count += 1
+            details = f"""
+Relevant CVE: {cve_id}
+Published Date: {cve_data["published"]}
+Modified Date: {cve_data["lastModified"]}
+Severity: {baseSeverity}
+Base Score: {GetcvssMetric["baseScore"]}
+Vector: {GetcvssMetric["vectorString"]}
+Description: {check_descriptions_language(descriptions)}
 
-            if cve_mentions_vendor(cve_data):
-                cve_count += 1
-                print(f"Relevant CVE: {cve}")
-                print(f"NVD Published Date: {published}")
-                print(f"NVD Last Modified: {lastModified}")
-                print(f"CVSS Version: {version}")
-                print(f"Severity: {baseSeverity}")
-                print(f"Base Score: {baseScore}")
-                print(f"Vector: {vectorString}")
-                print(f"Descriptions: {check_descriptions_language(descriptions)}")
-                print("   ")
-    print(f"There is {cve_count} number to look at!!")
-    
+"""
+            print(details)
+            email_body.append(details)
+
     if cve_count == 0:
-        print("No new CVEs for today!!!")
+        message = "No new CVEs for today!!!"
+        print(message)
+        email_body.append(message)
+    else:
+        header = f"There are {cve_count} CVEs to look at!\n\n"
+        print(header)
+        email_body.insert(0, header)
 
-main()
+    # Send email inside main
+    #send_email(
+     #   subject="Daily CVE Report",
+      #  body="".join(email_body),
+       # to_emails = os.getenv("EMAIL_TO").split(","),
+       # from_email = os.getenv("EMAIL_USER"),
+       # smtp_server = "smtp.gmail.com",
+       # smtp_port = 587,
+       # username = os.getenv("EMAIL_USER"),
+        #password = os.getenv("EMAIL_PASS")
+    #)
+
+
+if __name__ == "__main__":
+    main()
 
 
