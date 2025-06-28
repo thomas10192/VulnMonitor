@@ -28,7 +28,7 @@ Python 3.7+
 
 Dependencies: 
 ```
-# You will need the packages requests, openpyxl and python-dotenv
+# You will need the to install the packages requests, openpyxl and python-dotenv
 pip install requests openpyxl python-dotenv
 ```
 
