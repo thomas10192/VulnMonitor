@@ -16,13 +16,14 @@ Uses a vendor list stored in an Excel file.
 Loads secure email credentials from a .env file.
 
 📁 Project Structure
+'''
 .
-├── script.py                 # Main script
+├── script.py                # Main script
 ├── vendors_list.xlsx        # Excel file containing vendor names (1 per cell)
 ├── .env                     # Contains email credentials
 ├── nvdcve-1.1-recent.json   # Auto-generated file with recent CVEs
 └── README.md                # You're reading this
-
+'''
 ⚙️ Requirements
 Python 3.7+
 

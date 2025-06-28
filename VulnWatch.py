@@ -1,7 +1,6 @@
 import requests
 import datetime
 import json
-import re
 import openpyxl
 import smtplib
 from email.mime.text import MIMEText
