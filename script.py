@@ -9,6 +9,7 @@ import os
 from dotenv import load_dotenv 
 
 load_dotenv() 
+lookback_days = 1 # Number of days in the past to check for newly published CVEs (e.g., 1 = last 24 hours)
 
 def send_email(subject, body, to_emails, from_email, smtp_server, smtp_port, username, password):
     msg = MIMEMultipart()
@@ -98,7 +99,7 @@ def cve_mentions_vendor(cve_entry):
 def fetch_recent_critical_cves_from_history():
    # Calculate UTC timestamps for now and 24 hours ago
     now = datetime.datetime.now(datetime.UTC)
-    start_time = now - datetime.timedelta(days=1)
+    start_time = now - datetime.timedelta(days=lookback_days)
 
     # Format to required ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
     def format_iso8601_z(dt):
@@ -171,15 +172,15 @@ Description: {check_descriptions_language(descriptions)}
 
     # Add message to email based on relevant CVEs were found
     if cve_count == 0:
-        message = f"{totalResults} CVEs checked with no matches!!"
+        message = f"Checking CVEs updated between {start_str} and {now}\n{totalResults} CVEs checked with no matches!!"
         print(message)
         email_body.append(message)
     if cve_count == 1:
-        header = f"{totalResults} CVEs checked you have {cve_count} CVE to look at!\n\n"
+        header = f"Checking CVEs updated between {start_str} and {now}\n{totalResults} CVEs checked you have {cve_count} CVE to look at!\n\n"
         print(header)
         email_body.insert(0, header)
     elif cve_count > 1:
-        header = f"{totalResults} CVEs checked you have {cve_count} CVEs to look at!\n\n"
+        header = f"Checking CVEs updated between {start_str} and {now}\n{totalResults} CVEs checked you have {cve_count} CVEs to look at!\n\n"
         print(header)
         email_body.insert(0, header)
 
