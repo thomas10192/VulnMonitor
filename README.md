@@ -20,7 +20,7 @@ Loads secure email credentials from a .env file.<br/>
 ├── script.py                # Main script <br/>
 ├── vendors_list.xlsx        # Excel file containing vendor names (1 per cell)<br/>
 ├── .env                     # Contains email credentials<br/>
-├── nvdcve-1.1-recent.json   # Auto-generated file with recent CVEs<br/>
+├── nvdcve-1.1-recent.json   # Auto-generated file with recent CVEs used for testing<br/>
 └── README.md                # You're reading this<br/>
 
 ## ⚙️ Requirements<br/>
