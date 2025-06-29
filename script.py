@@ -193,7 +193,7 @@ Description: {check_descriptions_language(descriptions)}
         smtp_port = 587,
         username = os.getenv("EMAIL_USER"),
         password = os.getenv("EMAIL_PASS")
-    )
+    ) 
 
 
 if __name__ == "__main__":
