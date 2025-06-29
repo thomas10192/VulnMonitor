@@ -171,7 +171,7 @@ Description: {check_descriptions_language(descriptions)}
 
     # Add message to email based on relevant CVEs were found
     if cve_count == 0:
-        message = f"{totalResults} CVEs checked with no matches!!!"
+        message = f"{totalResults} CVEs checked with no matches!!"
         print(message)
         email_body.append(message)
     if cve_count == 1:
