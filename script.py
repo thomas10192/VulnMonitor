@@ -71,22 +71,21 @@ vendors_list = [v.strip() for v in Get_vendors() if v]
 def cve_mentions_vendor(cve_entry):
     texts = []
 
-    # 1. Descriptions
+    # Descriptions
     for desc in cve_entry.get("descriptions", []):
         texts.append(desc.get("value", ""))
 
-    # 2. References (URLs or sources might contain vendor names)
+    # References (URLs or sources might contain vendor names)
     for ref in cve_entry.get("references", []):
         texts.append(ref.get("url", ""))
         texts.append(ref.get("source", ""))
 
-    # 3. (Optional) Metrics source
+    # (Optional) Metrics source
     metrics = cve_entry.get("metrics", {})
     for key in metrics:
         for metric_item in metrics[key]:
             texts.append(metric_item.get("source", ""))
 
-    #print(texts)
     # Combine all text and search
     combined_text = " ".join(texts)
     combined_text_lower = combined_text.lower()
@@ -97,8 +96,8 @@ def cve_mentions_vendor(cve_entry):
 
 
 def fetch_recent_critical_cves_from_history():
-   # 1. Calculate UTC timestamps for now and 24 hours ago
-    now = datetime.datetime.utcnow()
+   # Calculate UTC timestamps for now and 24 hours ago
+    now = datetime.datetime.now(datetime.UTC)
     start_time = now - datetime.timedelta(days=1)
 
     # Format to required ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
@@ -108,7 +107,7 @@ def fetch_recent_critical_cves_from_history():
     start_str = format_iso8601_z(start_time)
     end_str = format_iso8601_z(now)
 
-    # 2. Fetch CVE history for that range
+    # Fetch CVE history for that time range
     history_url = "https://services.nvd.nist.gov/rest/json/cves/2.0"
     params = {
         "pubStartDate": start_str,
@@ -117,36 +116,32 @@ def fetch_recent_critical_cves_from_history():
 
     response = requests.get(history_url, params=params)
     
-
     if response.status_code != 200:
         print(f"Failed to retrive data {response.status_code}")
         exit()
         
-
+    # Serializing json
     data = response.json()
 
-    
-
-    # Serializing json
+    # The json object and writing to nvdcve-1.1-recent.json is for testing
     json_object = json.dumps(data, indent=4)
     
-
     # Writing to sample.json
     with open("nvdcve-1.1-recent.json", "w") as outfile:
        outfile.write(json_object)
 
-    # Load NVD data from a local .json file
-    with open("nvdcve-1.1-recent.json", "r") as file:
-        data = json.load(file)
-
-
-    return data
+    return data, now, start_str
 
 def main():
     email_body = []
     cve_count = 0
-    data = fetch_recent_critical_cves_from_history()
 
+    # Fectching CVE data from NVD
+    data, now, start_str = fetch_recent_critical_cves_from_history()
+
+    totalResults = data["totalResults"]
+    
+    # Looping over the CVEs from NVD 
     for item in data.get("vulnerabilities", []):
         cve_data = item["cve"]
         cve_id = cve_data["id"]
@@ -162,8 +157,7 @@ def main():
         if baseSeverity == "CRITICAL" and cve_mentions_vendor(cve_data):
             
             cve_count += 1
-            details = f"""
-Relevant CVE: {cve_id}
+            details = f"""CVE ID: {cve_id}
 Published Date: {cve_data["published"]}
 Modified Date: {cve_data["lastModified"]}
 Severity: {baseSeverity}
@@ -177,11 +171,15 @@ Description: {check_descriptions_language(descriptions)}
 
     # Add message to email based on relevant CVEs were found
     if cve_count == 0:
-        message = "No new CVEs for today!!!"
+        message = f"{totalResults} CVEs checked with no matches!!!"
         print(message)
         email_body.append(message)
-    else:
-        header = f"There are {cve_count} CVEs to look at!\n\n"
+    if cve_count == 1:
+        header = f"{totalResults} CVEs checked you have {cve_count} CVE to look at!\n\n"
+        print(header)
+        email_body.insert(0, header)
+    elif cve_count > 1:
+        header = f"{totalResults} CVEs checked you have {cve_count} CVEs to look at!\n\n"
         print(header)
         email_body.insert(0, header)
 
@@ -196,7 +194,6 @@ Description: {check_descriptions_language(descriptions)}
         username = os.getenv("EMAIL_USER"),
         password = os.getenv("EMAIL_PASS")
     ) 
-
 
 if __name__ == "__main__":
     main()
