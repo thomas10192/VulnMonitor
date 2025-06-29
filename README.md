@@ -51,7 +51,10 @@ https://myaccount.google.com/security<br/>
 https://myaccount.google.com/apppasswords <br/>
 Choose "Mail" > "Windows Computer"<br/>
 
-Create vendors_list.xlsx with vendor names in a single column (one name per row).<br/>
+Create vendors_list.xlsx with vendor or product names in a single column (one name per row). <br/>
+Begin at cell A1 and iterate down the column (A2, A3, A4, etc.) <br/>
+![image](https://github.com/user-attachments/assets/373856be-bcd7-42eb-93cb-d2f3bdad1d7e)
+
 
 ## ✉️ Output<br/>
 Prints matching CVEs in the console.<br/>
