@@ -157,6 +157,7 @@ def main():
         if GetcvssMetric is None:
             continue
 
+    # Getting critical vulnerabilities and then checking the vendors list
         baseSeverity = GetcvssMetric["baseSeverity"]
         if baseSeverity == "CRITICAL" and cve_mentions_vendor(cve_data):
             
@@ -174,6 +175,7 @@ Description: {check_descriptions_language(descriptions)}
             print(details)
             email_body.append(details)
 
+    # Add message to email based on relevant CVEs were found
     if cve_count == 0:
         message = "No new CVEs for today!!!"
         print(message)
@@ -193,7 +195,7 @@ Description: {check_descriptions_language(descriptions)}
         smtp_port = 587,
         username = os.getenv("EMAIL_USER"),
         password = os.getenv("EMAIL_PASS")
-    )
+    ) 
 
 
 if __name__ == "__main__":
